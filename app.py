@@ -45,6 +45,12 @@ def main():
         st.write(message)
         # Add an image
         st.image("dw.jpg", caption="Is the water safe for drink?", use_column_width=True)
+        # Add a slider for selecting the number of rows to display
+        num_rows = st.sidebar.slider("Number of Rows", 1, 15, 5)
+
+        # Display the selected number of rows
+        st.write(f"Displaying top {num_rows} rows:")
+        st.write(df.head(num_rows))
     
     #show info of the dataset
     info = st.sidebar.checkbox('Info of the Dataset')
@@ -54,13 +60,7 @@ def main():
     
 
     
-    st.write("Data overview:")
-    # Add a slider for selecting the number of rows to display
-    num_rows = st.sidebar.slider("Number of Rows", 1, 15, 5)
-
-    # Display the selected number of rows
-    st.write(f"Displaying top {num_rows} rows:")
-    st.write(df.head(num_rows))
+    
     
     
 

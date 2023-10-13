@@ -56,13 +56,11 @@ def main():
         st.write(f"Displaying top {num_rows} rows:")
         st.write(df.head(num_rows))
         
-        intro = 0
-    
-    #show info of the dataset
-    info = st.sidebar.checkbox('Info of the Dataset')
-    if info:
-        summary(df)
-        
+        #show info of the dataset
+        info = st.sidebar.checkbox('Describe the Dataset')
+        if info:
+            summary(df)
+
         intro = 0
         
     
@@ -74,8 +72,8 @@ def main():
         selected_plot = st.sidebar.selectbox("Choose a plot type", plot_options)
 
         if selected_plot == "Scatter plot":
-            x_axis = st.sidebar.selectbox("Select x-axis", df.columns)
-            y_axis = st.sidebar.selectbox("Select y-axis", df.columns)
+            x_axis = st.sidebar.selectbox("Select x-axis", df.columns, index=0)
+            y_axis = st.sidebar.selectbox("Select y-axis", df.columns, index=1)
             st.write("Scatter plot:")
             fig, ax = plt.subplots()
             sns.scatterplot(data = df, x=df[x_axis], y=df[y_axis], hue="Potability", ax=ax)

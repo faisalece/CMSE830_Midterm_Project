@@ -64,7 +64,7 @@ def main():
     if about:
         st.subheader("Water Potability! Is the water safe for drink?")
         # Add a slider for selecting the number of rows to display
-        num_rows = st.sidebar.slider("Number of Rows", 1, 15, 5)
+        num_rows = st.sidebar.slider("Number of Rows", 1, 100, 5)
 
         # Display the selected number of rows
         st.write(f"Displaying top {num_rows} rows:")

@@ -63,16 +63,17 @@ def main():
     about = st.sidebar.checkbox('About the Dataset')
     if about:
         st.subheader("Water Potability! Is the water safe for drink?")
-        message = "Access to safe drinking-water is essential to health, a basic human right and a component of effective policy for health protection. This is important as a health and development issue at a national, regional and local level. In some regions, it has been shown that investments in water supply and sanitation can yield a net economic benefit, since the reductions in adverse health effects and health care costs outweigh the costs of undertaking the interventions."
-        st.write(message)
-        # Add an image
-        st.image("dw.jpg", caption="Is the water safe for drink?", use_column_width=True)
         # Add a slider for selecting the number of rows to display
         num_rows = st.sidebar.slider("Number of Rows", 1, 15, 5)
 
         # Display the selected number of rows
         st.write(f"Displaying top {num_rows} rows:")
         st.write(df.head(num_rows))
+        # Add an image
+        st.image("dw.jpg", caption="Is the water safe for drink?", use_column_width=True)
+        message = "Access to safe drinking-water is essential to health, a basic human right and a component of effective policy for health protection. This is important as a health and development issue at a national, regional and local level. In some regions, it has been shown that investments in water supply and sanitation can yield a net economic benefit, since the reductions in adverse health effects and health care costs outweigh the costs of undertaking the interventions."
+        st.write(message)
+        
         
         #show info of the dataset
         info = st.sidebar.checkbox('Describe the Dataset')

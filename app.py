@@ -8,7 +8,7 @@ import hiplot as hip
 def summary(df):
     # Columns Summary
 
-    st.subheader('| QUICK SUMMARY')
+    st.subheader('| SUMMARY')
     
     col1, col2 = st.columns([2, 1])
     # column 1 - Describe
@@ -26,6 +26,24 @@ def summary(df):
         ax1.pie(potability_counts, labels=potability_counts.index, autopct='%1.1f%%', startangle=90)
         ax1.axis('equal')
         st.pyplot(fig1)
+        
+def missingdata(df):
+    # Columns Summary
+
+    st.subheader('| SUMMARY')
+    
+    col1, col2 = st.columns([1, 2])
+    # column 1 - Describe missing data
+    with col1:
+        st.write(df.isnull().sum())
+    # column 2 - Potability Pie
+    with col2:
+        st.write('Heatmap of Missing Values: ')
+        sns.heatmap(df.isna(), cmap="flare")
+        
+        #sns.heatmap(df.corr(), annot=True, cmap='coolwarm')
+        heatmap_fig = plt.gcf()  # Get the current figure
+        st.pyplot(heatmap_fig)
 
 def main():
     #intro
@@ -40,11 +58,11 @@ def main():
 
     # if data_file is not None:
     df = pd.read_csv("water_potability.csv")
-    st.subheader("Water Potability! Is the water safe for drink?")
     
     #show about the dataset
     about = st.sidebar.checkbox('About the Dataset')
     if about:
+        st.subheader("Water Potability! Is the water safe for drink?")
         message = "Access to safe drinking-water is essential to health, a basic human right and a component of effective policy for health protection. This is important as a health and development issue at a national, regional and local level. In some regions, it has been shown that investments in water supply and sanitation can yield a net economic benefit, since the reductions in adverse health effects and health care costs outweigh the costs of undertaking the interventions."
         st.write(message)
         # Add an image
@@ -106,14 +124,14 @@ def main():
     #show info of the dataset
     misdata = st.sidebar.checkbox('Summary of Missing Data')
     if misdata:
-        st.write(df.isnull().sum())
+        missingdata(df)
         
         intro = 0
             
     if intro == 1:
+        st.subheader("Water Potability! Is the water safe for drink?")
         # Convert the DataFrame to a HiPlot Experiment
         exp = hip.Experiment.from_dataframe(df)
-
         # Render the HiPlot experiment in Streamlit
         st.components.v1.html(exp.to_html(), width=900, height=600, scrolling=True)
     

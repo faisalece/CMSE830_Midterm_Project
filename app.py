@@ -68,18 +68,24 @@ def main():
     #show info of the dataset
     visual1 = st.sidebar.checkbox('See the EDA')
     if visual1:    
-        plot_options = ["Histogram","Scatter plot", "Box plot"]
+        plot_options = ["Correlation Heat Map", "Histogram of Column","Joint Plot of Columns", "Box Plot of Column"]
         selected_plot = st.sidebar.selectbox("Choose a plot type", plot_options)
 
-        if selected_plot == "Scatter plot":
+        if selected_plot == "Correlation Heat Map":
+            st.write("Correlation Heatmap:")
+            #plt.figure(figsize=(10, 10))
+            sns.heatmap(df.corr(), annot=True, cmap='coolwarm')
+            heatmap_fig = plt.gcf()  # Get the current figure
+            st.pyplot(heatmap_fig)
+        elif selected_plot == "Joint Plot of Columns":
             x_axis = st.sidebar.selectbox("Select x-axis", df.columns, index=0)
             y_axis = st.sidebar.selectbox("Select y-axis", df.columns, index=1)
-            st.write("Scatter plot:")
-            fig, ax = plt.subplots()
-            sns.scatterplot(data = df, x=df[x_axis], y=df[y_axis], hue="Potability", ax=ax)
-            st.pyplot(fig)
+            st.write("Joint Plot:")
+            jointplot = sns.jointplot(data = df, x=df[x_axis], y=df[y_axis], hue="Potability")
+            #sns.scatterplot(data = df, x=df[x_axis], y=df[y_axis], hue="Potability", ax=ax)
+            st.pyplot(jointplot)
 
-        elif selected_plot == "Histogram":
+        elif selected_plot == "Histogram of Column":
             column = st.sidebar.selectbox("Select a column", df.columns)
             bins = st.sidebar.slider("Number of bins", 5, 100, 20)
             st.write("Histogram:")
@@ -87,12 +93,20 @@ def main():
             sns.histplot(df[column], bins=bins, ax=ax)
             st.pyplot(fig)
 
-        elif selected_plot == "Box plot":
+        elif selected_plot == "Box Plot of Column":
             column = st.sidebar.selectbox("Select a column", df.columns)
-            st.write("Box plot:")
+            st.write("Box Plot:")
             fig, ax = plt.subplots()
             sns.boxplot(df[column], ax=ax)
             st.pyplot(fig)
+        
+        intro = 0
+        
+    st.sidebar.header("Missing Data Analysis")
+    #show info of the dataset
+    misdata = st.sidebar.checkbox('Summary of Missing Data')
+    if misdata:
+        st.write(df.isnull().sum())
         
         intro = 0
             

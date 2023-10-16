@@ -2,3 +2,4 @@ streamlit
 seaborn
 statsmodels
 hiplot
+sklearn

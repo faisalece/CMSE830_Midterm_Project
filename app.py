@@ -327,7 +327,7 @@ def main():
     #show info of the dataset
     visual1 = st.sidebar.checkbox('Exploratory Data Analysis (EDA)')
     if visual1:    
-        plot_options = ["Correlation Heat Map", "Joint Plot of Columns","Histogram of Column", "Pair Plot", "Box Plot of Column", "3D Scatter Plot"]
+        plot_options = ["Correlation Heat Map", "Joint Plot of Columns","Histogram of Column", "Pair Plot", "PairGrid Plot", "Box Plot of Column", "3D Scatter Plot"]
         selected_plot = st.sidebar.selectbox("Choose a plot type", plot_options)
 
         if selected_plot == "Correlation Heat Map":
@@ -363,6 +363,21 @@ def main():
             fig = px.scatter_matrix(selected_data, dimensions=dims, title="Pair Plot", color='Potability')
             fig.update_layout(plot_bgcolor="white")  
             st.plotly_chart(fig)
+            
+        elif selected_plot == "PairGrid Plot":
+            st.subheader("Pair Plot")
+            selected_box = st.multiselect('Select variables:', [col for col in df.columns if col != 'Potability'],default=['ph'])
+            selected_data = df[selected_box + ['Potability']]  # Add 'Potability' column
+
+            # Create a PairGrid
+            g = sns.PairGrid(selected_data, hue='Potability')
+            g.map_upper(plt.scatter)
+            g.map_diag(plt.hist, histtype="step", linewidth=2, bins=30)
+            g.map_lower(plt.scatter)
+            g.add_legend()
+
+            # Display the PairGrid plot
+            st.pyplot(plt.gcf())
         
         elif selected_plot == "Box Plot of Column":
             column = st.sidebar.selectbox("Select a column", df.columns)
@@ -487,6 +502,7 @@ def main():
         with con_tab:
             st.write("In this project, we conducted a thorough Exploratory Data Analysis (EDA) on the water portability dataset. Through visualizations and statistical summaries, we gained valuable insights into the chemical attributes influencing water quality. Key factors such as pH levels, Chloramines, and Solids content were analyzed in depth. The correlation heatmap provided a clear understanding of feature relationships. This EDA serves as a solid foundation for further analysis and potential model development.")
             st.write("The dataset used in this project contains information on nine chemical attributes: pH, Hardness, Solids, Chloramines, Sulfate, Conductivity, Organic Carbon, Trihalomethanes, and Turbidity. These attributes were crucial in training our models to predict the water potability accurately.This concise conclusion highlights the main achievements of your EDA project, emphasizing the importance of the insights gained for future analyses or model development.")
+            
 
 
 if __name__ == "__main__":

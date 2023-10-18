@@ -3,4 +3,4 @@ seaborn
 statsmodels
 hiplot
 scikit-learn
-
+plotly

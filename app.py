@@ -4,6 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import hiplot as hip
+import plotly.express as px
+#import altair as alt
 
 
 #sklearn
@@ -348,7 +350,7 @@ def main():
     #show info of the dataset
     visual1 = st.sidebar.checkbox('See the EDA')
     if visual1:    
-        plot_options = ["Correlation Heat Map", "Histogram of Column","Joint Plot of Columns", "Box Plot of Column"]
+        plot_options = ["Correlation Heat Map", "Histogram of Column","Joint Plot of Columns", "Box Plot of Column", "3D Scatter Plot"]
         selected_plot = st.sidebar.selectbox("Choose a plot type", plot_options)
 
         if selected_plot == "Correlation Heat Map":
@@ -370,8 +372,15 @@ def main():
             bins = st.sidebar.slider("Number of bins", 5, 100, 20)
             st.write("Histogram:")
             fig, ax = plt.subplots()
-            sns.histplot(df[column], bins=bins, ax=ax)
+            sns.histplot(data=df, x=column, hue="Potability",bins=bins, kde=True)
             st.pyplot(fig)
+        
+            
+            #bins = st.sidebar.slider("Number of bins", 5, 100, 20)
+            #st.write("Histogram:")
+            #fig, ax = plt.subplots()
+            #sns.histplot(df[column], bins=bins, ax=ax)
+            #st.pyplot(fig)
 
         elif selected_plot == "Box Plot of Column":
             column = st.sidebar.selectbox("Select a column", df.columns)
@@ -379,6 +388,14 @@ def main():
             fig, ax = plt.subplots()
             sns.boxplot(df[column], ax=ax)
             st.pyplot(fig)
+            
+        elif selected_plot == "3D Scatter Plot":
+            x_axis = st.sidebar.selectbox("Select x-axis", df.columns, index=0)
+            y_axis = st.sidebar.selectbox("Select y-axis", df.columns, index=1)
+            z_axis = st.sidebar.selectbox("Select z-axis", df.columns, index=2)
+            st.subheader("3D Scatter Plot")
+            fig = px.scatter_3d(df, x=x_axis, y=y_axis, z=z_axis, color='Potability')
+            st.plotly_chart(fig)
         
         intro = 0
         
@@ -420,6 +437,32 @@ def main():
         predict_KNN(df)
 
         intro = 0
+        
+    grp = st.sidebar.checkbox('Potability')
+    if grp:
+        # Group by Potability and calculate mean
+        grouped_data = df.groupby("Potability").mean().reset_index()
+
+        # Define the number of bars and their positions
+        num_bars = len(grouped_data)
+        bar_width = 0.35
+        index = np.arange(num_bars)
+
+        # Create the grouped bar chart
+        fig, ax = plt.subplots()
+        bar1 = ax.bar(index, grouped_data['ph'], bar_width, label='pH')
+        bar2 = ax.bar(index + bar_width, grouped_data['Hardness'], bar_width, label='Hardness')
+
+        # Add labels, title, and custom x-axis tick labels
+        ax.set_xlabel('Potability')
+        ax.set_ylabel('Mean Value')
+        ax.set_title('Mean Values by Potability')
+        ax.set_xticks(index + bar_width / 2)
+        ax.set_xticklabels(grouped_data['Potability'])
+        ax.legend()
+
+        # Display the chart
+        st.pyplot(fig)
             
     if intro == 1:
         st.subheader("Water Potability! Is the water safe for drink?")

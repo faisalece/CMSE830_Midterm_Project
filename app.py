@@ -309,7 +309,7 @@ def fill_data_KNN(df):
     return df_repaired
 
 def main():
-    #intro
+    #intro flag
     intro = 1;
     
     st.sidebar.title('CMSE 830 :  Midterm Project')
@@ -322,35 +322,12 @@ def main():
     # if data_file is not None:
     df = pd.read_csv("water_potability.csv")
     
-    #show about the dataset
-    about = st.sidebar.checkbox('About the Dataset')
-    if about:
-        st.subheader("Water Potability! Is the water safe for drink?")
-        # Add a slider for selecting the number of rows to display
-        num_rows = st.sidebar.slider("Number of Rows", 1, 100, 5)
 
-        # Display the selected number of rows
-        st.write(f"Displaying top {num_rows} rows:")
-        st.write(df.head(num_rows))
-        # Add an image
-        st.image("dw.jpg", caption="Is the water safe for drink?", use_column_width=True)
-        message = "Access to safe drinking-water is essential to health, a basic human right and a component of effective policy for health protection. This is important as a health and development issue at a national, regional and local level. In some regions, it has been shown that investments in water supply and sanitation can yield a net economic benefit, since the reductions in adverse health effects and health care costs outweigh the costs of undertaking the interventions."
-        st.write(message)
-        
-        
-        #show info of the dataset
-        info = st.sidebar.checkbox('Describe the Dataset')
-        if info:
-            summary(df)
-
-        intro = 0
-        
-    
     st.sidebar.header("Visualizations")
     #show info of the dataset
-    visual1 = st.sidebar.checkbox('See the EDA')
+    visual1 = st.sidebar.checkbox('Exploratory Data Analysis (EDA)')
     if visual1:    
-        plot_options = ["Correlation Heat Map", "Histogram of Column","Joint Plot of Columns", "Box Plot of Column", "3D Scatter Plot"]
+        plot_options = ["Correlation Heat Map", "Joint Plot of Columns","Histogram of Column", "Pair Plot", "Box Plot of Column", "3D Scatter Plot"]
         selected_plot = st.sidebar.selectbox("Choose a plot type", plot_options)
 
         if selected_plot == "Correlation Heat Map":
@@ -359,6 +336,7 @@ def main():
             sns.heatmap(df.corr(), annot=True, cmap='coolwarm')
             heatmap_fig = plt.gcf()  # Get the current figure
             st.pyplot(heatmap_fig)
+            
         elif selected_plot == "Joint Plot of Columns":
             x_axis = st.sidebar.selectbox("Select x-axis", df.columns, index=0)
             y_axis = st.sidebar.selectbox("Select y-axis", df.columns, index=1)
@@ -374,14 +352,18 @@ def main():
             fig, ax = plt.subplots()
             sns.histplot(data=df, x=column, hue="Potability",bins=bins, kde=True)
             st.pyplot(fig)
-        
             
-            #bins = st.sidebar.slider("Number of bins", 5, 100, 20)
-            #st.write("Histogram:")
-            #fig, ax = plt.subplots()
-            #sns.histplot(df[column], bins=bins, ax=ax)
-            #st.pyplot(fig)
-
+        elif selected_plot == "Pair Plot":
+            st.subheader("Pair Plot")
+            selected_box = st.multiselect('Select variables:', [col for col in df.columns if col != 'Potability'])
+            selected_data = df[selected_box + ['Potability']]  # Add 'Potability' column
+            all_columns = selected_data.columns
+            exclude_column = 'Potability' 
+            dims = [col for col in all_columns if col != exclude_column]
+            fig = px.scatter_matrix(selected_data, dimensions=dims, title="Pair Plot", color='Potability')
+            fig.update_layout(plot_bgcolor="white")  
+            st.plotly_chart(fig)
+        
         elif selected_plot == "Box Plot of Column":
             column = st.sidebar.selectbox("Select a column", df.columns)
             st.write("Box Plot:")
@@ -438,39 +420,73 @@ def main():
 
         intro = 0
         
-    grp = st.sidebar.checkbox('Potability')
-    if grp:
-        # Group by Potability and calculate mean
-        grouped_data = df.groupby("Potability").mean().reset_index()
-
-        # Define the number of bars and their positions
-        num_bars = len(grouped_data)
-        bar_width = 0.35
-        index = np.arange(num_bars)
-
-        # Create the grouped bar chart
-        fig, ax = plt.subplots()
-        bar1 = ax.bar(index, grouped_data['ph'], bar_width, label='pH')
-        bar2 = ax.bar(index + bar_width, grouped_data['Hardness'], bar_width, label='Hardness')
-
-        # Add labels, title, and custom x-axis tick labels
-        ax.set_xlabel('Potability')
-        ax.set_ylabel('Mean Value')
-        ax.set_title('Mean Values by Potability')
-        ax.set_xticks(index + bar_width / 2)
-        ax.set_xticklabels(grouped_data['Potability'])
-        ax.legend()
-
-        # Display the chart
-        st.pyplot(fig)
             
-    if intro == 1:
+    #show about the dataset
+    #show = st.sidebar.checkbox('Show Introduction')
+    #if show:
+        #intro=1;
+        
+    if intro:
         st.subheader("Water Potability! Is the water safe for drink?")
-        # Convert the DataFrame to a HiPlot Experiment
-        exp = hip.Experiment.from_dataframe(df)
-        # Render the HiPlot experiment in Streamlit
-        st.components.v1.html(exp.to_html(), width=900, height=600, scrolling=True)
+        
+         #tabs
+        intro_tab, goal_tab, describe_tab, hiplot_tab, significance_tab, con_tab = st.tabs(["Introduction", "Project Goal", "Describe the Dataset", "HiPlot", "Project Significance","Conclusion"])
+
+        with intro_tab:
+            col1, col2 = st.columns([1, 1])
+            with col1:
+                st.image("dw.jpg", caption="Is the water safe for drink?", use_column_width=True)
+            with col2:
+                st.write("Access to safe drinking-water is essential to health, a basic human right and a component of effective policy for health protection. This is important as a health and development issue at a national, regional and local level. In some regions, it has been shown that investments in water supply and sanitation can yield a net economic benefit, since the reductions in adverse health effects and health care costs outweigh the costs of undertaking the interventions.")
+            
+            
+            st.markdown('[Source : Kaggle Dataset](https://www.kaggle.com/datasets/adityakadiwal/water-potability)')
+            # Add a slider for selecting the number of rows to display
+            num_rows = st.slider("Number of Rows", 1, 3276, 100)
+
+            # Display the selected number of rows
+            st.write(f"Displaying top {num_rows} rows:")
+            st.write(df.head(num_rows))
+
+        with goal_tab:
+            st.write("The main objective of this mid-term project is to conduct a thorough analysis of the Water Quality dataset in order to assess the safety of water sources for consumption. Specifically, our aim is to develop a predictive model that can accurately determine the drinkability of water based on various comprehensive water quality parameters.")   
+            col1, col2 = st.columns([1, 1])
+            with col1:
+                st.subheader('| SUMMARY')
+                col = len(df.columns)-1
+                st.write('PARAMETERS : ',col)
+                row = len(df) 
+                st.write('TOTAL DATA : ', row)
+                st.write("Potability Distribution (Pie Chart)")
+                potability_counts = df['Potability'].value_counts()
+                fig1, ax1 = plt.subplots()
+                ax1.pie(potability_counts, labels=potability_counts.index, autopct='%1.1f%%', startangle=90)
+                ax1.axis('equal')
+                st.pyplot(fig1)
+            with col2:
+                st.write("This research aims to determine if a comprehensive analysis of water quality parameters can accurately predict the drinkability of water sources. Additionally, we seek to understand how the findings from this analysis can contribute to addressing the critical concern of ensuring safe drinking water for everyone. The significance of this project lies in its potential to have a direct impact on public health and well-being. Access to clean and safe drinking water is a basic human right, and by conducting this analysis, we hope to provide valuable insights that can inform water management decisions and help ensure the provision of safe drinking water to communities in need.")
+
+        with describe_tab:
+            st.write(df.describe())
     
+        with hiplot_tab:
+            # Convert the DataFrame to a HiPlot Experiment
+            exp = hip.Experiment.from_dataframe(df)
+            # Render the HiPlot experiment in Streamlit
+            st.components.v1.html(exp.to_html(), width=900, height=600, scrolling=True)
+        with significance_tab:
+            col1, col2 = st.columns([1, 1])
+            with col1:
+                st.write("This project holds great significance and is worthy of completion for multiple reasons.") 
+                st.write("Firstly, it addresses a social concern, which is safe drinking water. Access to safe water is essential for human health and well-being.") 
+            with col2:
+                st.image("wc.jpg", use_column_width=True)
+            st.write("Secondly, the analysis of the Water Quality dataset has the potential to save lives by identifying unsafe water sources. By using data analysis techniques, the project can detect patterns and indicators of water contamination, allowing for early intervention and prevention measures to be implemented.") 
+            st.write("Thirdly, the project offers valuable insights for water management and public health protection. By analyzing the dataset, it can provide information on the factors that contribute to water quality issues, enabling authorities and organizations to make informed decisions regarding water treatment, distribution, and policy-making.") 
+            st.write("Lastly, the development of a user-friendly web app provides a simple and accessible interface for accessing water drinkability predictions to a wide range of people.")
+        with con_tab:
+            st.write("In this project, we conducted a thorough Exploratory Data Analysis (EDA) on the water portability dataset. Through visualizations and statistical summaries, we gained valuable insights into the chemical attributes influencing water quality. Key factors such as pH levels, Chloramines, and Solids content were analyzed in depth. The correlation heatmap provided a clear understanding of feature relationships. This EDA serves as a solid foundation for further analysis and potential model development.")
+            st.write("The dataset used in this project contains information on nine chemical attributes: pH, Hardness, Solids, Chloramines, Sulfate, Conductivity, Organic Carbon, Trihalomethanes, and Turbidity. These attributes were crucial in training our models to predict the water potability accurately.This concise conclusion highlights the main achievements of your EDA project, emphasizing the importance of the insights gained for future analyses or model development.")
 
 
 if __name__ == "__main__":
